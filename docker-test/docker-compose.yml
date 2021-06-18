@@ -1,0 +1,54 @@
+# A docker-compose must always start by the version tag.
+# We use '3' because it's the latest version.
+version: '3'
+
+# Docker-compose works with services.
+# 1 service = 1 container.
+# For example, a service may be a server, a client, a database etc...
+# Use the keyword 'services' to start creating services.
+services:
+    # A server and a client are two services, i.e., two containers.
+
+    # First service (container): the server.
+    # Here you are free to choose the keyword.
+    # It will allow you to define what the service corresponds to.
+    # We use the keyword 'server' for the server.
+    server:
+
+        # The keyword 'build' will allow you to define the path to
+        # the dockerfile used to create the image that executes the service.
+        # Here '/server' corresponds to the path to the server folder
+        # that contains the Dockerfile.
+        build: server/
+
+        # The command to execute once the image is created.
+        command: python ./server.py
+
+        # In 'server/server.py' we defined 1234 as the port.
+        # If we want to access the server outside the container
+        # we must share the container port with our computers port.
+        # To do this, the keyword 'ports' will help us.
+        # [port we want on our machine]:[port to retrieve inside container]
+        ports: 
+            - 1234:1234
+
+    # Second service (container): the client.
+    # We use the keyword 'client'.
+    client:
+
+        # Here '/client' corresponds to the path to the client folder
+        # that contains the Dockerfile.
+        build: client/
+
+        # The command to execute once the image is created.
+        command: python ./client.py
+
+        # The keyword 'network_mode' is used to define the network type.
+        # Here we define that the container can access 'localhost' of the computer.
+        network_mode: host
+
+        # The keyword 'depends_on' allows you to define whether the service
+        # should wait until other services are ready before launching.
+        # Here, we want the 'client' service to wait until the 'server' service is ready.
+        depends_on:
+            - server
